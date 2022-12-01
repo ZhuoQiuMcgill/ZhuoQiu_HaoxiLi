@@ -1,4 +1,6 @@
 # Student agent: Add your own agent here
+import random
+
 from agents.agent import Agent
 from store import register_agent
 import sys
@@ -36,5 +38,50 @@ class StudentAgent(Agent):
 
         Please check the sample implementation in agents/random_agent.py or agents/human_agent.py for more details.
         """
-        # dummy return
-        return my_pos, self.dir_map["u"]
+        valid_moves = self.get_move_area(chess_board, my_pos, adv_pos, max_step)
+        i = random.randint(0, len(valid_moves) - 1)
+        next_pos = valid_moves[i]
+        print(valid_moves, "\n", next_pos)
+        next_dir = 0
+        for key in self.dir_map:
+            if not chess_board[next_pos[0]][next_pos[1]][self.dir_map[key]]:
+                next_dir = self.dir_map[key]
+                break
+        return next_pos, next_dir
+
+    def valid_move(self, x, y, x_max, y_max):
+        return 0 <= x < x_max and 0 <= y < y_max
+
+    def get_move_area(self, chess_board, my_pos, adv_pos, max_step):
+        """
+        This method is to find all the available moves in current position by BFS
+        return: list[(x,y)]
+        """
+        max_x, max_y = len(chess_board), len(chess_board[0])
+        result  = [my_pos]
+        moves   = [my_pos]
+        directions = [(-1, 0), (0, 1), (1, 0), (0, -1)]
+
+        for i in range(max_step):
+            next_move = []
+            for pos in moves:
+                r, c = pos
+
+                # check four direction
+                for key in self.dir_map:
+                    direction = self.dir_map[key]
+
+                    # block by wall
+                    if chess_board[r][c][direction]:
+                        continue
+
+                    new_x, new_y = (r + directions[direction][0], c + directions[direction][1])
+                    if self.valid_move(new_x, new_y, max_x, max_y) and \
+                            (new_x, new_y) not in result and (new_x, new_y) != adv_pos:
+                        next_move.append((new_x, new_y))
+                        result.append((new_x, new_y))
+
+            moves = next_move[:]
+        return result
+
+    
