@@ -22,6 +22,7 @@ class StudentAgent(Agent):
             "d": 2,
             "l": 3,
         }
+        self.autoplay = True
 
     def step(self, chess_board, my_pos, adv_pos, max_step):
         """
@@ -39,9 +40,12 @@ class StudentAgent(Agent):
         Please check the sample implementation in agents/random_agent.py or agents/human_agent.py for more details.
         """
         valid_moves = self.get_move_area(chess_board, my_pos, adv_pos, max_step)
-        i = random.randint(0, len(valid_moves) - 1)
-        next_pos = valid_moves[i]
-        print(valid_moves, "\n", next_pos)
+        if len(valid_moves) == 0:
+            next_pos = my_pos
+        else:
+            i = random.randint(0, len(valid_moves) - 1)
+            next_pos = valid_moves[i]
+        # print(valid_moves, "\n", next_pos)
         next_dir = 0
         for key in self.dir_map:
             if not chess_board[next_pos[0]][next_pos[1]][self.dir_map[key]]:
@@ -58,7 +62,7 @@ class StudentAgent(Agent):
         return: list[(x,y)]
         """
         max_x, max_y = len(chess_board), len(chess_board[0])
-        result  = [my_pos]
+        result  = []
         moves   = [my_pos]
         directions = [(-1, 0), (0, 1), (1, 0), (0, -1)]
 
@@ -75,13 +79,21 @@ class StudentAgent(Agent):
                     if chess_board[r][c][direction]:
                         continue
 
+                    block = 0
                     new_x, new_y = (r + directions[direction][0], c + directions[direction][1])
+                    for wall in chess_board[new_x][new_y]:
+                        if wall:
+                            block += 1
+
+                    # more than 2 walls in new position
+                    if block > 2:
+                        continue
+
                     if self.valid_move(new_x, new_y, max_x, max_y) and \
                             (new_x, new_y) not in result and (new_x, new_y) != adv_pos:
+
                         next_move.append((new_x, new_y))
                         result.append((new_x, new_y))
 
             moves = next_move[:]
         return result
-
-    
