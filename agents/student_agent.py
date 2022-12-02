@@ -30,7 +30,7 @@ class StudentAgent(Agent):
         self.board = None
         self.MCS_Tree = None
         self.last_step = None
-        self.init_expansions = 100
+        self.init_expansions = 10
 
     def step(self, chess_board, my_pos, adv_pos, max_step):
         """
@@ -49,12 +49,12 @@ class StudentAgent(Agent):
         """
         if self.current_turn == 0:
             self.board = Board(chess_board, my_pos, adv_pos, max_step)
-            print(my_pos)
+            # print(my_pos)
             self.MCS_Tree = MCSTree(self.board)
             for _ in range(self.init_expansions):
                 print(_)
                 self.MCS_Tree.expend()
-            # print(my_pos)
+            print(my_pos)
             next_step = self.MCS_Tree.best_step()
             new_root = self.MCS_Tree.root.children[next_step]
             self.last_step = next_step
@@ -96,7 +96,7 @@ class Board:
 
     def check_endgame(self):
         board_size = int(math.sqrt(self.chess_board.size / 4))
-        print(board_size)
+        #print(board_size)
         moves = ((-1, 0), (0, 1), (1, 0), (0, -1))
         father = dict()
         for r in range(board_size):
@@ -155,6 +155,14 @@ class Board:
         if move is None:
             return
         self.chess_board[move[0][0], move[0][1], move[1]] = True
+        if move[1] == 0:
+            self.chess_board[move[0][0] - 1, move[0][1], 2] = True
+        elif move[1] == 1:
+            self.chess_board[move[0][0], move[0][1] + 1, 3] = True
+        elif move[1] == 2:
+            self.chess_board[move[0][0] + 1, move[0][1], 0] = True
+        else:
+            self.chess_board[move[0][0], move[0][1] - 1, 1] = True
         if player == 0:
             self.my_pos = move[0]
         else:
@@ -187,13 +195,13 @@ class Node:
                 # print(is_end)
                 player = turn % 2
                 playermove = self.random_player_step(player)
-                print(player, playermove)
+                #print(player, playermove)
                 self.simulation_board.move_to(playermove, player)
                 turn += 1
                 is_end, p0_score, p1_score = self.simulation_board.check_endgame()
-                print(self.simulation_board.chess_board)
-                print(is_end, p0_score, p1_score)
-            print("loop end")
+                #print(self.simulation_board.chess_board)
+                #print(is_end, p0_score, p1_score)
+            #print("loop end")
             if p0_score > p1_score and self.player == 0:
                 self.wins += 1
             elif p0_score < p1_score and self.player == 1:
@@ -232,7 +240,7 @@ class Node:
                 if not wall:
                     all_moves.append((move, i))
                 i += 1
-        print(len(all_moves))
+        #print(len(all_moves))
         # create new node
         for move in all_moves:
             new_chess_board = self.chess_board.deep_copy()
@@ -243,7 +251,7 @@ class Node:
             new_child = Node(self, (self.player + 1) % 2, new_chess_board, self.max_sim, move)
             self.children[move] = new_child
             new_child.run_simulation()
-        print(len(all_moves))
+        #print(len(all_moves))
 
     def random_player_step(self, player_num):
         """
@@ -331,16 +339,17 @@ class MCSTree:
     def expend(self):
         node_ptr = self.root
         while len(node_ptr.children) != 0:
-            print()
+            #print()
             max_q = 0
             next_child = None
-            for child in node_ptr.children:
+            for key in node_ptr.children:
+                child = node_ptr.children[key]
                 q = child.q_star()
                 if q > max_q:
                     max_q = q
                     next_child = child
             node_ptr = next_child
-        print(node_ptr.children)
+        #print(node_ptr.children)
         node_ptr.expend()
 
     def update_root(self, node):
@@ -350,7 +359,8 @@ class MCSTree:
     def best_step(self):
         max_q = 0
         best_child = None
-        for child in self.root.children:
+        for key in self.root.children:
+            child = self.root.children[key]
             q = child.q_star()
             if q > max_q:
                 max_q = q
