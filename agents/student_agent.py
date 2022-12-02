@@ -1,6 +1,7 @@
 # Student agent: Add your own agent here
 import random
 
+
 from agents.agent import Agent
 from store import register_agent
 import sys
@@ -97,3 +98,5 @@ class StudentAgent(Agent):
 
             moves = next_move[:]
         return result
+
+

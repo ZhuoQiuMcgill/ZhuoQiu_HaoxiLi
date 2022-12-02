@@ -347,7 +347,6 @@ class World:
 
         def union(pos1, pos2):
             father[pos1] = pos2
-
         for r in range(self.board_size):
             for c in range(self.board_size):
                 for dir, move in enumerate(
