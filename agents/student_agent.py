@@ -66,6 +66,7 @@ class Board:
         self.adv_pos = adv_pos
         self.max_step = max_step
 
+
     def deep_copy(self):
         dup = copy.deepcopy(self)
         return dup
