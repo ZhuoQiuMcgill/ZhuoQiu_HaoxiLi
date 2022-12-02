@@ -18,8 +18,8 @@ logger = logging.getLogger(__name__)
 class World:
     def __init__(
         self,
-        player_1="random_agent",
-        player_2="improved_random_agent",
+        player_1="student_agent",
+        player_2="human_agent",
         board_size=None,
         display_ui=True,
         display_delay=1,
@@ -398,7 +398,6 @@ class World:
 
     def set_barrier(self, r, c, dir):
         # Set the barrier to True
-        # print(dir)
         self.chess_board[r, c, dir] = True
         # Set the opposite barrier to True
         move = self.moves[dir]
