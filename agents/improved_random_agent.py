@@ -45,11 +45,9 @@ class ImprovedRandomAgent(Agent):
             i = random.randint(0, len(valid_moves) - 1)
             next_pos = valid_moves[i]
         # print(valid_moves, "\n", next_pos)
-        next_dir = 0
-        for key in self.dir_map:
-            if not chess_board[next_pos[0]][next_pos[1]][self.dir_map[key]]:
-                next_dir = self.dir_map[key]
-                break
+        next_dir = random.randint(0, 3)
+        while chess_board[next_pos[0]][next_pos[1]][next_dir]:
+            next_dir = random.randint(0, 3)
         return next_pos, next_dir
 
     def valid_move(self, x, y, x_max, y_max):

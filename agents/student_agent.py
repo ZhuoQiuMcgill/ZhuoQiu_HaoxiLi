@@ -1,4 +1,5 @@
 # Student agent: Add your own agent here
+import copy
 import random
 import numpy as np
 
@@ -64,6 +65,9 @@ class Board:
         self.max_step = max_step
         self.moves = ((-1, 0), (0, 1), (1, 0), (0, -1))
 
+    def __copy__(self):
+        pass
+
     def check_endgame(self):
         father = dict()
         for r in range(self.board_size):
@@ -117,7 +121,11 @@ class Board:
         #     logging.info("Game ends! It is a Tie!")
         return True, p0_score, p1_score
 
-    def myMethod(self):
+    def move_to(self, move):
+        """
+
+        return deep copy of the board after move
+        """
         pass
 
 
@@ -126,10 +134,25 @@ class MCSTree:
         pass
 
     class Node:
-        def __init__(self):
-            self.ins = 0
+        def __init__(self, father, move, max_sim):
+            self.father = father
+            self.wins = 0
             self.simulations = 0
+            self.max_sim = max_sim
+            self.chess_board = father.move_to(move)
+            self.simulation_board = copy.deepcopy(self.chess_board)
 
-            pass
+        def reset_board(self):
+            self.simulation_board = copy.deepcopy(self.chess_board)
+
+        def run_simulate(self):
+            player1_win = 0
+            player2_win = 0
+            for _ in range(self.max_sim):
+                pass
+
+
+
+
 
 
