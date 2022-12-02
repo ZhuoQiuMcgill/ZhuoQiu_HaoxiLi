@@ -340,6 +340,7 @@ class World:
             The score of player 2.
         """
         # Union-Find
+        # print(self.chess_board)
         father = dict()
         # print(self.moves[1:3])
         for r in range(self.board_size):
@@ -358,6 +359,7 @@ class World:
                 for dir, move in enumerate(
                     self.moves[1:3]
                 ):  # Only check down and right
+                    # print(dir)
                     if self.chess_board[r, c, dir + 1]:
                         continue
                     pos_a = find((r, c))
@@ -370,8 +372,10 @@ class World:
                 find((r, c))
         p0_r = find(tuple(self.p0_pos))
         p1_r = find(tuple(self.p1_pos))
+        # print(p0_r, p1_r)
         p0_score = list(father.values()).count(p0_r)
         p1_score = list(father.values()).count(p1_r)
+        # print(p0_score, p1_score)
         if p0_r == p1_r:
             return False, p0_score, p1_score
         player_win = None
