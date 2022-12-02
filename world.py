@@ -104,7 +104,8 @@ class World:
         # Index in dim2 represents [Up, Right, Down, Left] respectively
         # Record barriers and boarders for each block
         self.chess_board = np.zeros((self.board_size, self.board_size, 4), dtype=bool)
-
+        # array = np.array(self.chess_board)
+        # print(array)
         # Set borders
         self.chess_board[0, :, 0] = True
         self.chess_board[:, 0, 3] = True
@@ -336,6 +337,7 @@ class World:
         """
         # Union-Find
         father = dict()
+        print(self.moves[1:3])
         for r in range(self.board_size):
             for c in range(self.board_size):
                 father[(r, c)] = (r, c)
