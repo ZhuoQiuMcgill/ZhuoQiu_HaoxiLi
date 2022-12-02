@@ -147,7 +147,6 @@ class Board:
         return True, p0_score, p1_score
 
     def move_to(self, move, player):
-
         if move is None:
             return
 
