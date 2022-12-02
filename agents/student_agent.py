@@ -87,12 +87,12 @@ class Board:
 
     def get_step(self, board, last_move):
         self.move_to(self, last_move, 0)
+        curpos = board.adv_pos
+
         for i in range(4):
-            if self.chess_board[board.adv_pos[0], board.adv_pos[1], i] != board.chess_board[board.adv_pos[0], board.adv_pos[1], i]:
+            if self.chess_board[curpos[0], curpos[1], i] != board.chess_board[curpos[0], curpos[1], i]:
                 wall = i
-        xdir = board.adv_pos[0] - self.adv_pos[0]
-        ydir = board.adv_pos[1] - self.adv_pos[1]
-        return xdir, ydir, wall
+        return curpos[0], curpos[1], wall
 
     def check_endgame(self):
         board_size = int(math.sqrt(self.chess_board.size / 4))
