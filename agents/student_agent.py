@@ -53,7 +53,7 @@ class StudentAgent(Agent):
             for _ in range(self.init_expansions):
                 self.MCS_Tree.expend()
             next_step = self.MCS_Tree.best_step()
-            new_root  = self.MCS_Tree.root.children[next_step]
+            new_root = self.MCS_Tree.root.children[next_step]
             self.last_step = next_step
             self.MCS_Tree.update_root(new_root)
             return next_step
@@ -70,6 +70,15 @@ class Board:
     def deep_copy(self):
         dup = copy.deepcopy(self)
         return dup
+
+    def get_step(self, board, last_move):
+        self.move_to(self, last_move, 0)
+        for i in range(4):
+            if self.chess_board[board.adv_pos[0], board.adv_pos[1], i] != board.chess_board[board.adv_pos[0], board.adv_pos[1], i]:
+                wall = i
+        xdir = board.adv_pos[0] - self.adv_pos[0]
+        ydir = board.adv_pos[1] - self.adv_pos[1]
+        return xdir, ydir, wall
 
     def check_endgame(self):
         board_size = int(math.sqrt(self.chess_board.size / 4))
@@ -137,11 +146,11 @@ class Board:
         if player == 0:
             self.my_pos[0] = self.my_pos[0] + xdir
             self.my_pos[1] = self.my_pos[1] + ydir
-            self.chess_board[xdir, ydir, wall] = True
+            self.chess_board[self.my_pos[0], self.my_pos[1], wall] = True
         else:
             self.adv_pos[0] = self.adv_pos[0] + xdir
             self.adv_pos[1] = self.adv_pos[1] + ydir
-            self.chess_board[xdir, ydir, wall] = True
+            self.chess_board[self.adv_pos[0], self.adv_pos[1], wall] = True
 
 
 class Node:
@@ -325,10 +334,3 @@ class MCSTree:
                 max_q = q
                 best_child = child
         return best_child.step
-
-
-
-
-
-
-
