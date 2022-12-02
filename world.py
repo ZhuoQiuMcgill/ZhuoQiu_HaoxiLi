@@ -337,6 +337,7 @@ class World:
         """
         # Union-Find
         father = dict()
+        print(self.moves[1:3])
         for r in range(self.board_size):
             for c in range(self.board_size):
                 father[(r, c)] = (r, c)
