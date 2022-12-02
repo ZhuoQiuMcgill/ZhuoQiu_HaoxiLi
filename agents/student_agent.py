@@ -61,6 +61,9 @@ class Board:
     def check_endgame(self):
         pass
 
+    def myMethod(self):
+        pass
+
 
 class MCSTree:
     def __init__(self, board):
