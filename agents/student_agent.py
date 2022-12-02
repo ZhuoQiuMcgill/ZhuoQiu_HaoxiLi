@@ -49,9 +49,12 @@ class StudentAgent(Agent):
         """
         if self.current_turn == 0:
             self.board = Board(chess_board, my_pos, adv_pos, max_step)
+            print(my_pos)
             self.MCS_Tree = MCSTree(self.board)
             for _ in range(self.init_expansions):
+                print(_)
                 self.MCS_Tree.expend()
+            # print(my_pos)
             next_step = self.MCS_Tree.best_step()
             new_root = self.MCS_Tree.root.children[next_step]
             self.last_step = next_step
@@ -93,6 +96,7 @@ class Board:
 
     def check_endgame(self):
         board_size = int(math.sqrt(self.chess_board.size / 4))
+        print(board_size)
         moves = ((-1, 0), (0, 1), (1, 0), (0, -1))
         father = dict()
         for r in range(board_size):
@@ -122,6 +126,7 @@ class Board:
         for r in range(board_size):
             for c in range(board_size):
                 find((r, c))
+        # print(self.my_pos)
         p0_r = find(tuple(self.my_pos))
         p1_r = find(tuple(self.adv_pos))
         p0_score = list(father.values()).count(p0_r)
@@ -147,25 +152,13 @@ class Board:
         return True, p0_score, p1_score
 
     def move_to(self, move, player):
-        new_pos = (-1, -1)
         if move is None:
             return
-
-        xdir = move[0][0]
-        ydir = move[0][1]
-        wall = move[1]
+        self.chess_board[move[0][0], move[0][1], move[1]] = True
         if player == 0:
-            # self.my_pos[0] = self.my_pos[0] + xdir
-            # self.my_pos[1] = self.my_pos[1] + ydir
-            new_pos = ( self.my_pos[0] + xdir, self.my_pos[1] + ydir)
-            self.chess_board[self.my_pos[0], self.my_pos[1], wall] = True
-            self.my_pos = new_pos
+            self.my_pos = move[0]
         else:
-            # self.adv_pos[0] = self.adv_pos[0] + xdir
-            # self.adv_pos[1] = self.adv_pos[1] + ydir
-            new_pos = (self.adv_pos[0] + xdir, self.adv_pos[1] + ydir)
-            self.chess_board[self.adv_pos[0], self.adv_pos[1], wall] = True
-            self.adv_pos = new_pos
+            self.adv_pos = move[0]
 
 
 class Node:
@@ -186,15 +179,21 @@ class Node:
 
     def run_simulation(self):
         for _ in range(self.max_sim):
+            # print(self.chess_board.my_pos)
             self.reset_board()
             turn = self.player + 1
             is_end, p0_score, p1_score = self.simulation_board.check_endgame()
             while not is_end:
+                # print(is_end)
                 player = turn % 2
-                self.simulation_board.move_to(self.random_player_step(player), player)
+                playermove = self.random_player_step(player)
+                print(player, playermove)
+                self.simulation_board.move_to(playermove, player)
                 turn += 1
                 is_end, p0_score, p1_score = self.simulation_board.check_endgame()
-
+                print(self.simulation_board.chess_board)
+                print(is_end, p0_score, p1_score)
+            print("loop end")
             if p0_score > p1_score and self.player == 0:
                 self.wins += 1
             elif p0_score < p1_score and self.player == 1:
@@ -219,6 +218,8 @@ class Node:
         adv_pos = self.chess_board.adv_pos
         max_step = self.chess_board.max_step
 
+        # print(my_pos)
+
         # find all moves
         if self.player == 0:
             move_area = self.get_move_area(chess_board, my_pos, adv_pos, max_step, True)
@@ -231,14 +232,18 @@ class Node:
                 if not wall:
                     all_moves.append((move, i))
                 i += 1
-
+        print(len(all_moves))
         # create new node
         for move in all_moves:
             new_chess_board = self.chess_board.deep_copy()
+            # print(new_chess_board.my_pos)
+            # print(self.chess_board.my_pos)
+            # print(move)
             new_chess_board.move_to(move, self.player)
             new_child = Node(self, (self.player + 1) % 2, new_chess_board, self.max_sim, move)
             self.children[move] = new_child
             new_child.run_simulation()
+        print(len(all_moves))
 
     def random_player_step(self, player_num):
         """
@@ -326,6 +331,7 @@ class MCSTree:
     def expend(self):
         node_ptr = self.root
         while len(node_ptr.children) != 0:
+            print()
             max_q = 0
             next_child = None
             for child in node_ptr.children:
@@ -334,6 +340,7 @@ class MCSTree:
                     max_q = q
                     next_child = child
             node_ptr = next_child
+        print(node_ptr.children)
         node_ptr.expend()
 
     def update_root(self, node):

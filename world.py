@@ -372,6 +372,7 @@ class World:
         p1_r = find(tuple(self.p1_pos))
         p0_score = list(father.values()).count(p0_r)
         p1_score = list(father.values()).count(p1_r)
+        print(p0_score, p1_score)
         if p0_r == p1_r:
             return False, p0_score, p1_score
         player_win = None
