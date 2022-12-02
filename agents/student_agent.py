@@ -58,6 +58,18 @@ class StudentAgent(Agent):
             self.MCS_Tree.update_root(new_root)
             return next_step
 
+        cur_board = Board(chess_board, my_pos, adv_pos, max_step)
+        adv_step = self.board.get_step(cur_board, self.last_step)
+        next_root = self.MCS_Tree.root.children[adv_step]
+        self.MCS_Tree.update_root(next_root)
+
+        next_step = self.MCS_Tree.best_step()
+        next_root = self.MCS_Tree.root.children[next_step]
+        self.MCS_Tree.update_root(next_root)
+
+        self.last_step = next_step
+        return next_step
+
 
 class Board:
     def __init__(self, chess_board, my_pos, adv_pos, max_step):
@@ -65,7 +77,6 @@ class Board:
         self.my_pos = my_pos
         self.adv_pos = adv_pos
         self.max_step = max_step
-
 
     def deep_copy(self):
         dup = copy.deepcopy(self)
@@ -220,7 +231,7 @@ class Node:
         # create new node
         for move in all_moves:
             new_chess_board = self.chess_board.deep_copy()
-            new_chess_board.move_to(move)
+            new_chess_board.move_to(move, self.player)
             new_child = Node(self, (self.player + 1) % 2, new_chess_board, self.max_sim, move)
             self.children[move] = new_child
             new_child.run_simulation()
