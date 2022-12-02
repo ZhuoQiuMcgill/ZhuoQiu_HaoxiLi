@@ -1,5 +1,6 @@
 # Student agent: Add your own agent here
 import random
+import numpy as np
 
 from agents.agent import Agent
 from store import register_agent
@@ -56,7 +57,10 @@ class StudentAgent(Agent):
 
 class Board:
     def __init__(self, chess_board, my_pos, adv_pos, max_step):
-        pass
+        self.chess_board = chess_board
+        self.my_pos = my_pos
+        self.adv_pos = adv_pos
+        self.max_step = max_step
 
     def check_endgame(self):
         pass
