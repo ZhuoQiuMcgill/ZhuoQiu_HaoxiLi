@@ -59,6 +59,7 @@ class StudentAgent(Agent):
             new_root = self.MCS_Tree.root.children[next_step]
             self.last_step = next_step
             self.MCS_Tree.update_root(new_root)
+            self.current_turn += 1
             return next_step
 
         cur_board = Board(chess_board, my_pos, adv_pos, max_step)
@@ -71,6 +72,7 @@ class StudentAgent(Agent):
         self.MCS_Tree.update_root(next_root)
 
         self.last_step = next_step
+        self.current_turn += 1
         return next_step
 
 
@@ -86,7 +88,7 @@ class Board:
         return dup
 
     def get_step(self, board, last_move):
-        self.move_to(self, last_move, 0)
+        self.move_to(last_move, 0)
         for i in range(4):
             if self.chess_board[board.adv_pos[0], board.adv_pos[1], i] != board.chess_board[board.adv_pos[0], board.adv_pos[1], i]:
                 wall = i
@@ -333,7 +335,7 @@ class Node:
 class MCSTree:
 
     def __init__(self, board):
-        self.max_sim = 100
+        self.max_sim = 10
         self.root = Node(None, 0, board, self.max_sim, None)
 
     def expend(self):
@@ -365,4 +367,5 @@ class MCSTree:
             if q > max_q:
                 max_q = q
                 best_child = child
-        return best_child.step
+
+        return best_child.move
