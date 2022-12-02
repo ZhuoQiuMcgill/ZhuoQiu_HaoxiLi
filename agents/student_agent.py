@@ -121,9 +121,10 @@ class Board:
         #     logging.info("Game ends! It is a Tie!")
         return True, p0_score, p1_score
 
-    def move_to(self, move):
+    def move_to(self, move, player):
         """
-
+        move = ((x, y), dir)
+        player = 0 / 1
         return deep copy of the board after move
         """
         pass
@@ -134,32 +135,58 @@ class MCSTree:
         pass
 
     class Node:
-        def __init__(self, father, move, max_sim):
+        def __init__(self, father, player, move, max_sim):
             self.father = father
+            self.player = player
             self.wins = 0
-            self.simulations = 0
+            self.simulations = max_sim
             self.max_sim = max_sim
             self.chess_board = self.father.chess_board.deep_copy()
-            self.chess_board.move_to(move)
+            self.chess_board.move_to(move, player)
             self.simulation_board = self.father.chess_board.deep_copy()
+            self.children = dict()
 
         def reset_board(self):
-            self.simulation_board = copy.deepcopy(self.chess_board)
+            self.simulation_board = self.father.chess_board.deep_copy()
 
         def run_simulate(self):
-            player1_win = 0
-            player2_win = 0
             for _ in range(self.max_sim):
-                pass
+                self.reset_board()
+                turn = self.player + 1
+                is_end, p0_score, p1_score = self.simulation_board.check_endgame()
+                while not is_end:
+                    player = turn % 2
+                    self.simulation_board.move_to(self.random_player_step(player), player)
+                    turn += 1
+                    is_end, p0_score, p1_score = self.simulation_board.check_endgame()
 
-        def random_player_step(self):
+                if p0_score > p1_score and self.player == 0:
+                    self.wins += 1
+                elif p0_score < p1_score and self.player == 1:
+                    self.wins += 1
+
+        def update_simulations(self):
+            father = self.father
+            while father is not None:
+                father.win += self.wins
+                father.simulations += self.simulations
+                father = father.father
+
+        def expend(self):
+            pass
+
+        def random_player_step(self, player_num):
             """
             this method simulate a random player's move
             """
             chess_board_r = self.simulation_board.chess_board
             max_step_r = self.simulation_board.max_step
-            my_pos_r = self.simulation_board.adv_pos
-            adv_pos_r = self.simulation_board.my_pos
+            if player_num == 0:
+                my_pos_r = self.simulation_board.my_pos
+                adv_pos_r = self.simulation_board.adv_pos
+            else:
+                my_pos_r = self.simulation_board.adv_pos
+                adv_pos_r = self.simulation_board.my_pos
             dir_map = {
                 "u": 0,
                 "r": 1,
@@ -180,7 +207,7 @@ class MCSTree:
                 moves = [my_pos]
                 directions = [(-1, 0), (0, 1), (1, 0), (0, -1)]
 
-                for i in range(max_step):
+                for _ in range(max_step):
                     next_move = []
                     for pos in moves:
                         r, c = pos
