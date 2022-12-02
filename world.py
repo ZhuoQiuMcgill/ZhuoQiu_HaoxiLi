@@ -398,7 +398,7 @@ class World:
 
     def set_barrier(self, r, c, dir):
         # Set the barrier to True
-        print(dir)
+        # print(dir)
         self.chess_board[r, c, dir] = True
         # Set the opposite barrier to True
         move = self.moves[dir]

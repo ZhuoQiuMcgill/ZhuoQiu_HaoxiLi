@@ -135,7 +135,7 @@ class Board:
         return True, p0_score, p1_score
 
     def move_to(self, move, player):
-
+        new_pos = (-1, -1)
         if move is None:
             return
 
@@ -143,13 +143,17 @@ class Board:
         ydir = move[0][1]
         wall = move[1]
         if player == 0:
-            self.my_pos[0] = self.my_pos[0] + xdir
-            self.my_pos[1] = self.my_pos[1] + ydir
+            # self.my_pos[0] = self.my_pos[0] + xdir
+            # self.my_pos[1] = self.my_pos[1] + ydir
+            new_pos = ( self.my_pos[0] + xdir, self.my_pos[1] + ydir)
             self.chess_board[self.my_pos[0], self.my_pos[1], wall] = True
+            self.my_pos = new_pos
         else:
-            self.adv_pos[0] = self.adv_pos[0] + xdir
-            self.adv_pos[1] = self.adv_pos[1] + ydir
+            # self.adv_pos[0] = self.adv_pos[0] + xdir
+            # self.adv_pos[1] = self.adv_pos[1] + ydir
+            new_pos = (self.adv_pos[0] + xdir, self.adv_pos[1] + ydir)
             self.chess_board[self.adv_pos[0], self.adv_pos[1], wall] = True
+            self.adv_pos = new_pos
 
 
 class Node:
