@@ -53,65 +53,24 @@ class StudentAgent(Agent):
                 break
         return next_pos, next_dir
 
-    def valid_move(self, x, y, x_max, y_max):
-        return 0 <= x < x_max and 0 <= y < y_max
 
-    def get_move_area(self, chess_board, my_pos, adv_pos, max_step):
-        """
-        This method is to find all the available moves in current position by BFS
-        return: list[(x,y)]
-        """
-        max_x, max_y = len(chess_board), len(chess_board[0])
-        result  = []
-        moves   = [my_pos]
-        directions = [(-1, 0), (0, 1), (1, 0), (0, -1)]
+class Board:
+    def __init__(self, chess_board, my_pos, adv_pos, max_step):
+        pass
 
-        for i in range(max_step):
-            next_move = []
-            for pos in moves:
-                r, c = pos
-
-                # check four direction
-                for key in self.dir_map:
-                    direction = self.dir_map[key]
-
-                    # block by wall
-                    if chess_board[r][c][direction]:
-                        continue
-
-                    block = 0
-                    new_x, new_y = (r + directions[direction][0], c + directions[direction][1])
-                    for wall in chess_board[new_x][new_y]:
-                        if wall:
-                            block += 1
-
-                    # more than 2 walls in new position
-                    if block > 2:
-                        continue
-
-                    if self.valid_move(new_x, new_y, max_x, max_y) and \
-                            (new_x, new_y) not in result and (new_x, new_y) != adv_pos:
-
-                        next_move.append((new_x, new_y))
-                        result.append((new_x, new_y))
-
-            moves = next_move[:]
-        return result
+    def check_endgame(self):
+        pass
 
 
-class MCST:
-    def __init__(self):
-        self.root = MCST()
+class MCSTree:
+    def __init__(self, board):
+        pass
 
-    class MCST_node:
-        def __init__(self, father):
-            self.father = father
-            self.win = 0
+    class Node:
+        def __init__(self):
+            self.ins = 0
             self.simulations = 0
-            self.children = []
 
-        def simulate(self):
             pass
 
-        def check_end(self):
-            pass
+
