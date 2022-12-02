@@ -288,6 +288,10 @@ class World:
             The direction of the barrier.
         """
         # Endpoint already has barrier or is boarder
+        # print(start_pos)
+        # print(start_pos[0])
+        # print(start_pos[1])
+        # print(end_pos)
         r, c = end_pos
         if self.chess_board[r, c, barrier_dir]:
             return False
@@ -337,7 +341,7 @@ class World:
         """
         # Union-Find
         father = dict()
-        print(self.moves[1:3])
+        # print(self.moves[1:3])
         for r in range(self.board_size):
             for c in range(self.board_size):
                 father[(r, c)] = (r, c)
@@ -394,6 +398,7 @@ class World:
 
     def set_barrier(self, r, c, dir):
         # Set the barrier to True
+        print(dir)
         self.chess_board[r, c, dir] = True
         # Set the opposite barrier to True
         move = self.moves[dir]

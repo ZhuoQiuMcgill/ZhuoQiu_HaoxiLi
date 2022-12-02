@@ -1,5 +1,6 @@
 # Student agent: Add your own agent here
 import copy
+import math
 import random
 import numpy as np
 
@@ -58,20 +59,21 @@ class StudentAgent(Agent):
 
 class Board:
     def __init__(self, chess_board, my_pos, adv_pos, max_step):
-        self.board_size = None
         self.chess_board = chess_board
         self.my_pos = my_pos
         self.adv_pos = adv_pos
         self.max_step = max_step
-        self.moves = ((-1, 0), (0, 1), (1, 0), (0, -1))
 
     def __copy__(self):
-        pass
+        dup = copy.deepcopy(self)
+        return dup
 
     def check_endgame(self):
+        board_size = int(math.sqrt(self.chess_board.size / 4))
+        moves = ((-1, 0), (0, 1), (1, 0), (0, -1))
         father = dict()
-        for r in range(self.board_size):
-            for c in range(self.board_size):
+        for r in range(board_size):
+            for c in range(board_size):
                 father[(r, c)] = (r, c)
 
         def find(pos):
@@ -82,10 +84,10 @@ class Board:
         def union(pos1, pos2):
             father[pos1] = pos2
 
-        for r in range(self.board_size):
-            for c in range(self.board_size):
+        for r in range(board_size):
+            for c in range(board_size):
                 for dir, move in enumerate(
-                        self.moves[1:3]
+                        moves[1:3]
                 ):  # Only check down and right
                     if self.chess_board[r, c, dir + 1]:
                         continue
@@ -94,8 +96,8 @@ class Board:
                     if pos_a != pos_b:
                         union(pos_a, pos_b)
 
-        for r in range(self.board_size):
-            for c in range(self.board_size):
+        for r in range(board_size):
+            for c in range(board_size):
                 find((r, c))
         p0_r = find(tuple(self.my_pos))
         p1_r = find(tuple(self.adv_pos))
@@ -121,12 +123,23 @@ class Board:
         #     logging.info("Game ends! It is a Tie!")
         return True, p0_score, p1_score
 
-    def move_to(self, move):
-        """
+    def move_to(self, move, player):
+        xdir = move[0][0]
+        ydir = move[0][1]
+        wall = move[1]
+        if player == 0:
+            self.my_pos[0] = self.my_pos[0] + xdir
+            self.my_pos[1] = self.my_pos[1] + ydir
+            self.chess_board[xdir, ydir, wall] = True
+        else:
+            self.adv_pos[0] = self.adv_pos[0] + xdir
+            self.adv_pos[1] = self.adv_pos[1] + ydir
+            self.chess_board[xdir, ydir, wall] = True
 
-        return deep copy of the board after move
-        """
-        pass
+
+
+
+
 
 
 class MCSTree:
