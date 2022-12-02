@@ -1,4 +1,5 @@
 # Student agent: Add your own agent here
+import copy
 import random
 
 from agents.agent import Agent
@@ -58,10 +59,17 @@ class Board:
     def __init__(self, chess_board, my_pos, adv_pos, max_step):
         pass
 
+    def __copy__(self):
+        pass
+
     def check_endgame(self):
         pass
 
-    def myMethod(self):
+    def move_to(self, move):
+        """
+
+        return deep copy of the board after move
+        """
         pass
 
 
@@ -70,10 +78,25 @@ class MCSTree:
         pass
 
     class Node:
-        def __init__(self):
-            self.ins = 0
+        def __init__(self, father, move, max_sim):
+            self.father = father
+            self.wins = 0
             self.simulations = 0
+            self.max_sim = max_sim
+            self.chess_board = father.move_to(move)
+            self.simulation_board = copy.deepcopy(self.chess_board)
 
-            pass
+        def reset_board(self):
+            self.simulation_board = copy.deepcopy(self.chess_board)
+
+        def run_simulate(self):
+            player1_win = 0
+            player2_win = 0
+            for _ in range(self.max_sim):
+                pass
+
+
+
+
 
 
