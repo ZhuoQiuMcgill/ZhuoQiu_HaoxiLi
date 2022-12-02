@@ -1,4 +1,3 @@
-# Student agent: Add your own agent here
 import random
 
 from agents.agent import Agent
@@ -6,16 +5,16 @@ from store import register_agent
 import sys
 
 
-@register_agent("student_agent")
-class StudentAgent(Agent):
+@register_agent("improved_random_agent")
+class ImprovedRandomAgent(Agent):
     """
     A dummy class for your implementation. Feel free to use this class to
     add any helper functionalities needed for your agent.
     """
 
     def __init__(self):
-        super(StudentAgent, self).__init__()
-        self.name = "StudentAgent"
+        super(ImprovedRandomAgent, self).__init__()
+        self.name = "ImprovedRandomAgent"
         self.dir_map = {
             "u": 0,
             "r": 1,
@@ -97,21 +96,3 @@ class StudentAgent(Agent):
 
             moves = next_move[:]
         return result
-
-
-class MCST:
-    def __init__(self):
-        self.root = MCST()
-
-    class MCST_node:
-        def __init__(self, father):
-            self.father = father
-            self.win = 0
-            self.simulations = 0
-            self.children = []
-
-        def simulate(self):
-            pass
-
-        def check_end(self):
-            pass
