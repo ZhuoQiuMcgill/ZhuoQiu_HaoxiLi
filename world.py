@@ -9,6 +9,7 @@ import logging
 from store import AGENT_REGISTRY
 from constants import *
 import sys
+import tracemalloc
 
 logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.INFO)
 
@@ -487,4 +488,9 @@ if __name__ == "__main__":
     # is_end, p0_score, p1_score = world.step()
     # while not is_end:
     #     is_end, p0_score, p1_score = world.step()
-    play(100)
+    tracemalloc.start()
+    play(1)
+    current, peak = tracemalloc.get_traced_memory()
+    print("Current Memory: {} MB".format(current / (1024 * 1024)))
+    print("Peak Memory: {} MB".format(peak / (1024 * 1024)))
+    tracemalloc.stop()
