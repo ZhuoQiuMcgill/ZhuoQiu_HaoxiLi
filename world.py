@@ -469,8 +469,12 @@ def play(max_game):
         elif p0_score < p1_score:
             player1_win += 1
         else:
+            print("Tie game")
             tie_game += 1
         print("Game", i + 1, "done!")
+        print("A win", player0_win, "games")
+        print("B win", player1_win, "games")
+
     print("A wins: ", player0_win)
     print("B wins: ", player1_win)
     print("Tie Games:", tie_game)
