@@ -388,6 +388,11 @@ class MCSTree:
         for key in self.root.children:
             child = self.root.children[key]
             q = child.q_star()
+
+            is_end, p0_score, p1_score = child.chess_board.check_endgame()
+            if is_end and p0_score > p1_score:
+                return child.move
+
             if q > max_q:
                 max_q = q
                 best_child = child
