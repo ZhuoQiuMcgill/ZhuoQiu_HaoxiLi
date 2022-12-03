@@ -2,11 +2,9 @@
 import copy
 import math
 import random
-import numpy as np
 
 from agents.agent import Agent
 from store import register_agent
-import sys
 
 
 @register_agent("student_agent")
@@ -49,30 +47,48 @@ class StudentAgent(Agent):
         """
         if self.current_turn == 0:
             self.board = Board(chess_board, my_pos, adv_pos, max_step)
-            # print(my_pos)
+
             self.MCS_Tree = MCSTree(self.board)
             for _ in range(self.init_expansions):
-                print(_)
+                if _ % 5 == 0:
+                    print(_)
                 self.MCS_Tree.expend()
-            print(my_pos)
+
             next_step = self.MCS_Tree.best_step()
             new_root = self.MCS_Tree.root.children[next_step]
             self.last_step = next_step
+
             self.MCS_Tree.update_root(new_root)
+
+            if len(self.MCS_Tree.root.children) == 0:
+                for _ in range(1):
+                    self.MCS_Tree.expend()
+
             self.current_turn += 1
+
             return next_step
 
         cur_board = Board(chess_board, my_pos, adv_pos, max_step)
         adv_step = self.board.get_step(cur_board, self.last_step)
         next_root = self.MCS_Tree.root.children[adv_step]
+
         self.MCS_Tree.update_root(next_root)
+
+        if len(self.MCS_Tree.root.children) == 0:
+            for _ in range(1):
+                self.MCS_Tree.expend()
 
         next_step = self.MCS_Tree.best_step()
         next_root = self.MCS_Tree.root.children[next_step]
         self.MCS_Tree.update_root(next_root)
 
+        if len(self.MCS_Tree.root.children) == 0:
+            for _ in range(1):
+                self.MCS_Tree.expend()
+
         self.last_step = next_step
         self.current_turn += 1
+
         return next_step
 
 
@@ -90,7 +106,7 @@ class Board:
     def get_step(self, board, last_move):
         self.move_to(last_move, 0)
         curpos = board.adv_pos
-
+        wall = 0
         for i in range(4):
             if self.chess_board[curpos[0], curpos[1], i] != board.chess_board[curpos[0], curpos[1], i]:
                 wall = i
@@ -98,7 +114,7 @@ class Board:
 
     def check_endgame(self):
         board_size = int(math.sqrt(self.chess_board.size / 4))
-        #print(board_size)
+
         moves = ((-1, 0), (0, 1), (1, 0), (0, -1))
         father = dict()
         for r in range(board_size):
@@ -128,29 +144,14 @@ class Board:
         for r in range(board_size):
             for c in range(board_size):
                 find((r, c))
-        # print(self.my_pos)
+
         p0_r = find(tuple(self.my_pos))
         p1_r = find(tuple(self.adv_pos))
         p0_score = list(father.values()).count(p0_r)
         p1_score = list(father.values()).count(p1_r)
         if p0_r == p1_r:
             return False, p0_score, p1_score
-        # player_win = None
-        # win_blocks = -1
-        # if p0_score > p1_score:
-        #     player_win = 0
-        #     win_blocks = p0_score
-        # elif p0_score < p1_score:
-        #     player_win = 1
-        #     win_blocks = p1_score
-        # else:
-        #     player_win = -1  # Tie
-        # if player_win >= 0:
-        #     logging.info(
-        #         f"Game ends! Player {self.player_names[player_win]} wins having control over {win_blocks} blocks!"
-        #     )
-        # else:
-        #     logging.info("Game ends! It is a Tie!")
+
         return True, p0_score, p1_score
 
     def move_to(self, move, player):
@@ -191,23 +192,19 @@ class Node:
         for _ in range(self.max_sim):
             # print(self.chess_board.my_pos)
             self.reset_board()
-            turn = self.player + 1
+            turn = self.player
             is_end, p0_score, p1_score = self.simulation_board.check_endgame()
             while not is_end:
-                # print(is_end)
                 player = turn % 2
                 playermove = self.random_player_step(player)
-                #print(player, playermove)
+
                 self.simulation_board.move_to(playermove, player)
                 turn += 1
                 is_end, p0_score, p1_score = self.simulation_board.check_endgame()
-                #print(self.simulation_board.chess_board)
-                #print(is_end, p0_score, p1_score)
-            #print("loop end")
-            if p0_score > p1_score and self.player == 0:
+
+            if p0_score > p1_score:
                 self.wins += 1
-            elif p0_score < p1_score and self.player == 1:
-                self.wins += 1
+
         self.update_simulations()
 
     def update_simulations(self):
@@ -228,8 +225,6 @@ class Node:
         adv_pos = self.chess_board.adv_pos
         max_step = self.chess_board.max_step
 
-        # print(my_pos)
-
         # find all moves
         if self.player == 0:
             move_area = self.get_move_area(chess_board, my_pos, adv_pos, max_step, True)
@@ -242,18 +237,14 @@ class Node:
                 if not wall:
                     all_moves.append((move, i))
                 i += 1
-        #print(len(all_moves))
+
         # create new node
         for move in all_moves:
             new_chess_board = self.chess_board.deep_copy()
-            # print(new_chess_board.my_pos)
-            # print(self.chess_board.my_pos)
-            # print(move)
             new_chess_board.move_to(move, self.player)
             new_child = Node(self, (self.player + 1) % 2, new_chess_board, self.max_sim, move)
             self.children[move] = new_child
             new_child.run_simulation()
-        #print(len(all_moves))
 
     def random_player_step(self, player_num):
         """
@@ -335,13 +326,12 @@ class Node:
 class MCSTree:
 
     def __init__(self, board):
-        self.max_sim = 10
+        self.max_sim = 100
         self.root = Node(None, 0, board, self.max_sim, None)
 
     def expend(self):
         node_ptr = self.root
         while len(node_ptr.children) != 0:
-            #print()
             max_q = 0
             next_child = None
             for key in node_ptr.children:
@@ -351,7 +341,6 @@ class MCSTree:
                     max_q = q
                     next_child = child
             node_ptr = next_child
-        #print(node_ptr.children)
         node_ptr.expend()
 
     def update_root(self, node):
