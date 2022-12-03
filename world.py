@@ -19,10 +19,10 @@ logger = logging.getLogger(__name__)
 class World:
     def __init__(
         self,
-        player_1="student_agent",
-        player_2="MH_agent",
+        player_1="MH_agent",
+        player_2="student_agent",
         board_size=None,
-        display_ui=False,
+        display_ui=True,
         display_delay=1,
         display_save=False,
         display_save_path=None,
