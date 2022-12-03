@@ -1,6 +1,6 @@
 # Constants used throughout the game
-MIN_BOARD_SIZE = 8
-MAX_BOARD_SIZE = 9
+MIN_BOARD_SIZE = 5
+MAX_BOARD_SIZE = 6
 AGENT_NOT_FOUND_MSG = (
     "Check if you have used the decorator @register_agent to register your agent!"
 )
@@ -18,3 +18,4 @@ PLAYER_1_NAME = "A"
 PLAYER_2_NAME = "B"
 PLAYER_1_COLOR = "tab:blue"
 PLAYER_2_COLOR = "tab:brown"
+DEBUG_MODE = False

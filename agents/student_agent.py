@@ -39,8 +39,8 @@ class StudentAgent(Agent):
         # init expansion times
         self.exp_dir   = {5 : 10,
                           6 : 8,
-                          7 : 5,
-                          8 : 2,
+                          7 : 3,
+                          8 : 1,
                           9 : 1}
         # extra simulation times
         self.exsim_dir = {5 : 40,
@@ -265,11 +265,16 @@ class Node:
 
         # find all moves
         if self.player == 0:
-            move_area = self.get_move_area(chess_board, my_pos, adv_pos, max_step, True)
+            move_area = self.get_move_area(chess_board, my_pos, adv_pos, max_step)
         else:
-            move_area = self.get_move_area(chess_board, adv_pos, my_pos, max_step, False)
+            move_area = self.get_move_area(chess_board, adv_pos, my_pos, max_step)
+
         all_moves = []
         for move in move_area:
+            r, c = move
+            if list(self.chess_board.chess_board[r][c]).count(True) > 2:
+                continue
+
             i = 0
             for wall in chess_board[move[0]][move[1]]:
                 if not wall:
@@ -297,7 +302,7 @@ class Node:
             my_pos_r = self.simulation_board.adv_pos
             adv_pos_r = self.simulation_board.my_pos
 
-        valid_moves = self.get_move_area(chess_board_r, my_pos_r, adv_pos_r, max_step_r, True)
+        valid_moves = self.get_move_area(chess_board_r, my_pos_r, adv_pos_r, max_step_r)
         if len(valid_moves) == 0:
             next_pos = my_pos_r
         else:
@@ -310,7 +315,7 @@ class Node:
         return next_pos, next_dir
 
     @staticmethod
-    def get_move_area(chess_board, my_pos, adv_pos, max_step, improved):
+    def get_move_area(chess_board, my_pos, adv_pos, max_step):
         """
         improved (bool): if improved, it will not return the position with more than 2 barriers
         This method is to find all the available moves in current position by BFS
@@ -343,15 +348,7 @@ class Node:
                     if chess_board[r][c][direction]:
                         continue
 
-                    block = 0
                     new_x, new_y = (r + directions[direction][0], c + directions[direction][1])
-                    for wall in chess_board[new_x][new_y]:
-                        if wall:
-                            block += 1
-
-                    # more than 2 walls in new position
-                    if block > 2 and improved:
-                        continue
 
                     if valid_move(new_x, new_y, max_x, max_y) and \
                             (new_x, new_y) not in result and (new_x, new_y) != adv_pos:
@@ -363,7 +360,6 @@ class Node:
 
 
 class MCSTree:
-
     def __init__(self, board):
         self.max_sim = 10
         self.root = Node(None, 0, board, self.max_sim, None)
