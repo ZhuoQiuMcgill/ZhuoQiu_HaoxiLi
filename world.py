@@ -19,7 +19,7 @@ class World:
     def __init__(
         self,
         player_1="student_agent",
-        player_2="improved_random_agent",
+        player_2="MH_agent",
         board_size=None,
         display_ui=False,
         display_delay=1,
@@ -474,6 +474,7 @@ def play(max_game):
         print("Game", i + 1, "done!")
         print("A win", player0_win, "games")
         print("B win", player1_win, "games")
+        print("A : ", p0_score, "\t", "B : ", p1_score)
 
     print("A wins: ", player0_win)
     print("B wins: ", player1_win)

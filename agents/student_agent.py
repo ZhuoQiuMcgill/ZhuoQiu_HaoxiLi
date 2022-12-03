@@ -268,8 +268,13 @@ class Node:
             move_area = self.get_move_area(chess_board, my_pos, adv_pos, max_step, True)
         else:
             move_area = self.get_move_area(chess_board, adv_pos, my_pos, max_step, False)
+
         all_moves = []
         for move in move_area:
+            r, c = move
+            if list(self.chess_board.chess_board[r][c]).count(True) > 2:
+                continue
+
             i = 0
             for wall in chess_board[move[0]][move[1]]:
                 if not wall:
@@ -343,15 +348,17 @@ class Node:
                     if chess_board[r][c][direction]:
                         continue
 
-                    block = 0
                     new_x, new_y = (r + directions[direction][0], c + directions[direction][1])
-                    for wall in chess_board[new_x][new_y]:
-                        if wall:
-                            block += 1
 
-                    # more than 2 walls in new position
-                    if block > 2 and improved:
-                        continue
+                    # improved random
+                    # block = 0
+                    # for wall in chess_board[new_x][new_y]:
+                    #     if wall:
+                    #         block += 1
+                    #
+                    # # more than 2 walls in new position
+                    # if block > 2 and improved:
+                    #     continue
 
                     if valid_move(new_x, new_y, max_x, max_y) and \
                             (new_x, new_y) not in result and (new_x, new_y) != adv_pos:
@@ -363,7 +370,6 @@ class Node:
 
 
 class MCSTree:
-
     def __init__(self, board):
         self.max_sim = 10
         self.root = Node(None, 0, board, self.max_sim, None)
