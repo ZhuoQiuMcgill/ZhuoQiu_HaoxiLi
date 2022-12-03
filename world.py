@@ -19,9 +19,9 @@ class World:
     def __init__(
         self,
         player_1="student_agent",
-        player_2="human_agent",
+        player_2="improved_random_agent",
         board_size=None,
-        display_ui=True,
+        display_ui=False,
         display_delay=1,
         display_save=False,
         display_save_path=None,
@@ -222,7 +222,6 @@ class World:
                     )
                 )
             if not self.check_valid_step(cur_pos, next_pos, dir):
-                print(self.chess_board)
                 raise ValueError(
                     "Not a valid step from {} to {} and put barrier at {}, with max steps = {}".format(
                         cur_pos, next_pos, dir, self.max_step
@@ -480,7 +479,8 @@ def play(max_game):
 
 # python simulator.py --player_1 random_agent --player_2 student_agent --autoplay
 if __name__ == "__main__":
-    world = World()
-    is_end, p0_score, p1_score = world.step()
-    while not is_end:
-        is_end, p0_score, p1_score = world.step()
+    # world = World()
+    # is_end, p0_score, p1_score = world.step()
+    # while not is_end:
+    #     is_end, p0_score, p1_score = world.step()
+    play(100)
