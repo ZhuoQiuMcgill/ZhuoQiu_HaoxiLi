@@ -2,6 +2,7 @@
 import copy
 import math
 import random
+import time
 
 from agents.agent import Agent
 from store import register_agent
@@ -28,7 +29,25 @@ class StudentAgent(Agent):
         self.board = None
         self.MCS_Tree = None
         self.last_step = None
-        self.init_expansions = 10
+
+        # init simulation times
+        self.sim_dir   = {5 : 100,
+                          6 : 30,
+                          7 : 8,
+                          8 : 3,
+                          9 : 1}
+        # init expansion times
+        self.exp_dir   = {5 : 10,
+                          6 : 8,
+                          7 : 5,
+                          8 : 2,
+                          9 : 1}
+        # extra simulation times
+        self.exsim_dir = {5 : 40,
+                          6 : 10,
+                          7 : 5,
+                          8 : 2,
+                          9 : 1}
 
     def step(self, chess_board, my_pos, adv_pos, max_step):
         """
@@ -45,13 +64,14 @@ class StudentAgent(Agent):
 
         Please check the sample implementation in agents/random_agent.py or agents/human_agent.py for more details.
         """
+        st = time.time()
+        board_size = len(chess_board)
         if self.current_turn == 0:
             self.board = Board(chess_board, my_pos, adv_pos, max_step)
-
             self.MCS_Tree = MCSTree(self.board)
-            for _ in range(self.init_expansions):
-                if _ % 5 == 0:
-                    print(_)
+            self.MCS_Tree.max_sim = self.exp_dir[board_size]
+
+            for _ in range(self.sim_dir[board_size]):
                 self.MCS_Tree.expend()
 
             next_step = self.MCS_Tree.best_step()
@@ -61,20 +81,30 @@ class StudentAgent(Agent):
             self.MCS_Tree.update_root(new_root)
 
             if len(self.MCS_Tree.root.children) == 0:
+                self.MCS_Tree.max_sim = 30
                 for _ in range(1):
                     self.MCS_Tree.expend()
 
             self.current_turn += 1
 
+            et = time.time()
+            init_time = round(et - st, 3)
+            print("init time =", init_time, "sec")
             return next_step
 
         cur_board = Board(chess_board, my_pos, adv_pos, max_step)
         adv_step = self.board.get_step(cur_board, self.last_step)
-        next_root = self.MCS_Tree.root.children[adv_step]
 
-        self.MCS_Tree.update_root(next_root)
+        if adv_step not in self.MCS_Tree.root.children:
+            self.MCS_Tree = MCSTree(cur_board)
+        else:
+            next_root = self.MCS_Tree.root.children[adv_step]
+            self.MCS_Tree.update_root(next_root)
 
+        mt = time.time()
+        # no choices for current state
         if len(self.MCS_Tree.root.children) == 0:
+            self.MCS_Tree.max_sim = self.exsim_dir[board_size]
             for _ in range(1):
                 self.MCS_Tree.expend()
 
@@ -82,12 +112,20 @@ class StudentAgent(Agent):
         next_root = self.MCS_Tree.root.children[next_step]
         self.MCS_Tree.update_root(next_root)
 
+        # no choices for next state
         if len(self.MCS_Tree.root.children) == 0:
+            self.MCS_Tree.max_sim = 0
             for _ in range(1):
                 self.MCS_Tree.expend()
 
         self.last_step = next_step
         self.current_turn += 1
+
+        et = time.time()
+        before_time = round(mt - st, 3)
+        init_time = round(et - mt, 3)
+        # print("before time =", before_time, "sec")
+        print("simulate time =", init_time, "sec")
 
         return next_step
 
@@ -188,8 +226,8 @@ class Node:
     def reset_board(self):
         self.simulation_board = self.chess_board.deep_copy()
 
-    def run_simulation(self):
-        for _ in range(self.max_sim):
+    def run_simulation(self, max_sim):
+        for _ in range(max_sim):
             # print(self.chess_board.my_pos)
             self.reset_board()
             turn = self.player
@@ -219,7 +257,7 @@ class Node:
             return 0
         return self.wins / self.simulations * math.sqrt(2 * math.log10(self.father.simulations))
 
-    def expend(self):
+    def expend(self, max_sim):
         chess_board = self.chess_board.chess_board
         my_pos = self.chess_board.my_pos
         adv_pos = self.chess_board.adv_pos
@@ -244,7 +282,7 @@ class Node:
             new_chess_board.move_to(move, self.player)
             new_child = Node(self, (self.player + 1) % 2, new_chess_board, self.max_sim, move)
             self.children[move] = new_child
-            new_child.run_simulation()
+            new_child.run_simulation(max_sim)
 
     def random_player_step(self, player_num):
         """
@@ -326,7 +364,7 @@ class Node:
 class MCSTree:
 
     def __init__(self, board):
-        self.max_sim = 100
+        self.max_sim = 10
         self.root = Node(None, 0, board, self.max_sim, None)
 
     def expend(self):
@@ -341,7 +379,7 @@ class MCSTree:
                     max_q = q
                     next_child = child
             node_ptr = next_child
-        node_ptr.expend()
+        node_ptr.expend(self.max_sim)
 
     def update_root(self, node):
         self.root = node
@@ -356,5 +394,6 @@ class MCSTree:
             if q > max_q:
                 max_q = q
                 best_child = child
-
-        return best_child.move
+        if best_child is not None:
+            return best_child.move
+        return (0, 0), 0
