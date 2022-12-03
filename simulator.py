@@ -106,8 +106,8 @@ class Simulator:
             for i in tqdm(range(self.args.autoplay_runs)):
 
                 swap_players = i % 2 == 0
-                board_size = np.random.randint(args.board_size_min, args.board_size_max)
-
+                # board_size = np.random.randint(args.board_size_min, args.board_size_max)
+                board_size = np.random.randint(5, 10)
                 p0_score, p1_score, p0_time, p1_time = self.run(
                     swap_players=swap_players, board_size=board_size
                 )

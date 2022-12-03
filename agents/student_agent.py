@@ -109,6 +109,8 @@ class StudentAgent(Agent):
                 self.MCS_Tree.expend()
 
         next_step = self.MCS_Tree.best_step()
+
+        # TO DO: (0, 0), 0
         next_root = self.MCS_Tree.root.children[next_step]
         self.MCS_Tree.update_root(next_root)
 
@@ -122,9 +124,7 @@ class StudentAgent(Agent):
         self.current_turn += 1
 
         et = time.time()
-        before_time = round(mt - st, 3)
         init_time = round(et - mt, 3)
-        # print("before time =", before_time, "sec")
         print("simulate time =", init_time, "sec")
 
         return next_step
@@ -143,12 +143,12 @@ class Board:
 
     def get_step(self, board, last_move):
         self.move_to(last_move, 0)
-        curpos = board.adv_pos
+        cur_pos = board.adv_pos
         wall = 0
         for i in range(4):
-            if self.chess_board[curpos[0], curpos[1], i] != board.chess_board[curpos[0], curpos[1], i]:
+            if self.chess_board[cur_pos[0], cur_pos[1], i] != board.chess_board[cur_pos[0], cur_pos[1], i]:
                 wall = i
-        return (curpos[0], curpos[1]), wall
+        return (cur_pos[0], cur_pos[1]), wall
 
     def check_endgame(self):
         board_size = int(math.sqrt(self.chess_board.size / 4))
@@ -169,10 +169,10 @@ class Board:
 
         for r in range(board_size):
             for c in range(board_size):
-                for dir, move in enumerate(
+                for dire, move in enumerate(
                         moves[1:3]
                 ):  # Only check down and right
-                    if self.chess_board[r, c, dir + 1]:
+                    if self.chess_board[r, c, dire + 1]:
                         continue
                     pos_a = find((r, c))
                     pos_b = find((r + move[0], c + move[1]))
@@ -234,9 +234,9 @@ class Node:
             is_end, p0_score, p1_score = self.simulation_board.check_endgame()
             while not is_end:
                 player = turn % 2
-                playermove = self.random_player_step(player)
+                player_move = self.random_player_step(player)
 
-                self.simulation_board.move_to(playermove, player)
+                self.simulation_board.move_to(player_move, player)
                 turn += 1
                 is_end, p0_score, p1_score = self.simulation_board.check_endgame()
 
@@ -309,7 +309,8 @@ class Node:
             next_dir = random.randint(0, 3)
         return next_pos, next_dir
 
-    def get_move_area(self, chess_board, my_pos, adv_pos, max_step, improved):
+    @staticmethod
+    def get_move_area(chess_board, my_pos, adv_pos, max_step, improved):
         """
         improved (bool): if improved, it will not return the position with more than 2 barriers
         This method is to find all the available moves in current position by BFS
