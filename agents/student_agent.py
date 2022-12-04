@@ -70,6 +70,7 @@ class StudentAgent(Agent):
             self.board = Board(chess_board, my_pos, adv_pos, max_step)
             self.MCS_Tree = MCSTree(self.board)
             self.MCS_Tree.max_sim = self.exp_dir[board_size]
+            # print("\nBoard size: ", board_size)
 
             for _ in range(self.sim_dir[board_size]):
                 self.MCS_Tree.expend()
@@ -89,7 +90,7 @@ class StudentAgent(Agent):
 
             et = time.time()
             init_time = round(et - st, 3)
-            print("init time =", init_time, "sec")
+            # print("init time =", init_time, "sec")
             return next_step
 
         cur_board = Board(chess_board, my_pos, adv_pos, max_step)
@@ -125,7 +126,7 @@ class StudentAgent(Agent):
 
         et = time.time()
         init_time = round(et - mt, 3)
-        print("simulate time =", init_time, "sec")
+        # print("step time =", init_time, "sec")
 
         return next_step
 
